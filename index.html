@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W. Parsons (2012) - Políticas Públicas</title>
+    <style>
+        /* ==========================================================================
+           VARIABLES Y RESET
+           ========================================================================== */
+        :root {
+            --azul-profundo: #0F172A;
+            --azul-hover: #1E293B;
+            --gris-pizarra: #475569;
+            --gris-claro: #CBD5E1;
+            --blanco-hueso: #F8FAFC;
+            --blanco-puro: #FFFFFF;
+            --acento: #3B82F6;
+            
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --font-serif: 'Georgia', 'Times New Roman', Times, serif;
+            
+            --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--blanco-hueso);
+            color: var(--azul-profundo);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==========================================================================
+           LAYOUT PRINCIPAL (GRID / FLEX)
+           ========================================================================== */
+        #app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* SIDEBAR / ÍNDICE PERSISTENTE */
+        #sidebar {
+            width: 300px;
+            background-color: var(--azul-profundo);
+            color: var(--blanco-hueso);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            z-index: 10;
+            transition: var(--transicion);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--gris-pizarra);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.4;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            color: var(--gris-claro);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .nav-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+            scroll-behavior: smooth;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: var(--transicion);
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--gris-claro);
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: var(--blanco-puro);
+        }
+
+        .nav-item.active {
+            border-left-color: var(--acento);
+            background-color: var(--azul-hover);
+            color: var(--blanco-puro);
+            font-weight: 600;
+        }
+
+        /* ÁREA PRINCIPAL DE DIAPOSITIVAS */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--blanco-hueso);
+            overflow: hidden;
+        }
+
+        #slide-container {
+            flex: 1;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            overflow-y: auto;
+        }
+
+        #slide-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================================
+           ESTILOS DE CONTENIDO ACADÉMICO (SÍNTESIS VISUAL)
+           ========================================================================== */
+        .section-badge {
+            display: inline-block;
+            background-color: var(--gris-pizarra);
+            color: var(--blanco-puro);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--azul-profundo);
+            margin-bottom: 2rem;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        .slide-synthesis {
+            font-size: 1.15rem;
+            color: var(--gris-pizarra);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        /* Interacciones de Texto y Botones */
+        .clickable-text {
+            color: var(--acento);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .clickable-text:hover {
+            color: var(--azul-profundo);
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 4px;
+        }
+
+        .buttons-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .btn-profundidad {
+            background-color: var(--azul-profundo);
+            color: var(--blanco-puro);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+        }
+
+        .btn-profundidad:hover {
+            background-color: var(--gris-pizarra);
+            transform: translateY(-2px);
+        }
+
+        /* Componentes de Diagramas Funcionales */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .concept-card {
+            background: var(--blanco-puro);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--gris-pizarra);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .concept-card h4 {
+            font-size: 1.1rem;
+            color: var(--azul-profundo);
+            margin-bottom: 0.8rem;
+        }
+
+        .concept-card p {
+            font-size: 0.95rem;
+            color: var(--gris-pizarra);
+            line-height: 1.5;
+        }
+
+        .diagram-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--blanco-puro);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .diagram-node {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .diagram-node strong {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .diagram-arrow {
+            color: var(--gris-claro);
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        /* Controles Inferiores */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: var(--blanco-puro);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            min-height: 80px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--gris-claro);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--azul-profundo);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .slide-counter {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gris-pizarra);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 2px solid var(--gris-pizarra);
+            color: var(--azul-profundo);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transicion);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--azul-profundo);
+            color: var(--blanco-puro);
+            border-color: var(--azul-profundo);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ==========================================================================
+           MODAL / POPOVER DE TEXTO ÍNTEGRO (SERIF)
+           ========================================================================== */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background-color: var(--blanco-hueso);
+            width: 90%;
+            max-width: 850px;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid var(--gris-claro);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--blanco-puro);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: var(--azul-profundo);
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--gris-pizarra);
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .btn-close:hover {
+            color: #EF4444;
+        }
+
+        .modal-body {
+            padding: 3rem;
+            overflow-y: auto;
+            font-family: var(--font-serif);
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .modal-body p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+
+        .modal-body ul {
+            margin-bottom: 1.5rem;
+            margin-left: 2rem;
+        }
+
+        .modal-body li {
+            margin-bottom: 0.5rem;
+            text-align: justify;
+        }
+
+        .modal-body blockquote {
+            border-left: 4px solid var(--gris-pizarra);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: var(--gris-pizarra);
+        }
+
+        /* ==========================================================================
+           RESPONSIVIDAD (MOBILE / TABLET)
+           ========================================================================== */
+        @media (max-width: 992px) {
+            #app-container { flex-direction: column; }
+            #sidebar { width: 100%; height: 60px; flex-direction: row; align-items: center; overflow: hidden; }
+            .sidebar-header { padding: 0 1rem; border: none; flex: 1; }
+            .sidebar-header h1 { font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .sidebar-header p { display: none; }
+            .nav-menu { display: flex; overflow-x: auto; padding: 0; }
+            .nav-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; padding: 1rem; }
+            .nav-item.active { border-left-color: transparent; border-bottom-color: var(--acento); }
+            #slide-container { padding: 2rem; }
+            .slide-title { font-size: 2rem; }
+            .controls { padding: 1rem 2rem; }
+            .modal-body { padding: 1.5rem; font-size: 1rem; }
+            .diagram-flow { flex-direction: column; }
+            .diagram-arrow { transform: rotate(90deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .slide-title { font-size: 1.6rem; }
+            .btn-profundidad { width: 100%; justify-content: center; }
+            .controls { padding: 1rem; }
+            .progress-container { margin: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- ÍNDICE PERSISTENTE -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h1>Seminario MCP</h1>
+                <p>Wayne Parsons (2012)</p>
+            </div>
+            <nav class="nav-menu" id="nav-menu">
+                <!-- Generado por JS -->
+            </nav>
+        </aside>
+
+        <!-- ÁREA DE DIAPOSITIVAS -->
+        <main id="main-content">
+            <div id="slide-container">
+                <!-- Contenido inyectado por JS -->
+            </div>
+
+            <!-- CONTROLES -->
+            <div class="controls">
+                <button class="nav-btn" id="btn-prev" aria-label="Anterior">←</button>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="slide-counter" id="slide-counter">1 / 26</div>
+                </div>
+                <button class="nav-btn" id="btn-next" aria-label="Siguiente">→</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL PARA TEXTO PROFUNDO -->
+    <div id="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-title">Título del Modal</h3>
+                <button class="btn-close" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-text">
+                <!-- Texto inyectado por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- LÓGICA DE LA APLICACIÓN -->
+    <script>
+        /**
+         * ESTRUCTURA DE DATOS: 26 diapositivas exactas (Portada + 25 de contenido).
+         * Cada diapositiva contiene un array de 'popups' con el texto ÍNTEGRO solicitado.
+         */
+        const slidesData = [
+            // ================= PORTADA =================
+            {
+                section: "Portada",
+                sectionTitle: "Inicio",
+                title: "", 
+                visual: `
+                    <div style="text-align: center; padding: 4rem 2rem; background: var(--blanco-puro); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 6px solid var(--acento); position: relative; overflow: hidden; margin-bottom: 2rem;">
+                        <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--blanco-hueso); border-radius: 50%; z-index: 0; opacity: 0.5;"></div>
+                        <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: var(--blanco-hueso); border-radius: 50%; z-index: 0; opacity: 0.5;"></div>
+                        
+                        <div style="position: relative; z-index: 1;">
+                            <h3 style="color: var(--gris-pizarra); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 1.5rem;">Wayne Parsons</h3>
+                            <h1 style="color: var(--azul-profundo); font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px;">POLÍTICAS PÚBLICAS.</h1>
+                            <p style="font-size: 1.25rem; color: var(--gris-pizarra); font-style: italic; margin-bottom: 2.5rem; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5;">Una introducción a la teoría y la práctica del análisis de políticas públicas</p>
+                            
+                            <div style="background: var(--blanco-hueso); padding: 1.5rem 3rem; border-radius: 50px; display: inline-block; margin-bottom: 3rem; border: 1px solid var(--gris-claro);">
+                                <h4 style="color: var(--azul-profundo); font-size: 1.2rem; margin-bottom: 0.2rem;">Capítulo I: Meta-análisis</h4>
+                                <p style="color: var(--gris-pizarra); font-size: 1rem; font-weight: 600;">Secciones 1.2 a la 1.6</p>
+                            </div>
+                            
+                            <div style="padding-top: 1.5rem; border-top: 1px solid var(--blanco-hueso);">
+                                <p style="color: var(--gris-pizarra); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 2px;">Presenta:</p>
+                                <p style="color: var(--azul-profundo); font-size: 1.4rem; font-weight: 700; margin-top: 0.5rem;">Prof. Carlos A Navarrete Ulloa</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                popups: []
+            },
+
+            // ================= SECCIÓN 1.2 =================
+            {
+                section: "1.2",
+                sectionTitle: "Lo público y las políticas",
+                title: "La Dicotomía Clásica: Lo Público vs. Lo Privado",
+                visual: `
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Antigüedad Clásica</strong><br><small>koinon/idion<br>res publica/res privata</small></div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-node"><strong>Arendt & Saxonhouse</strong><br><small>polis vs. unidad doméstica</small></div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-node"><strong>Aristóteles</strong><br><small>La <i>polis</i></small></div>
+                    </div>
+                    <p class="slide-synthesis">
+                        La discusión sobre políticas comienza clarificando qué es "lo público". 
+                        Esta noción no es estable; ha sido una tensión histórica desde la 
+                        <span class="clickable-text" onclick="openModal(0)">Antigüedad Clásica (Grecia y Roma)</span>. 
+                        Diversos autores, como <span class="clickable-text" onclick="openModal(1)">Arendt, Saxonhouse y Aristóteles</span>, 
+                        han teorizado sobre la oposición entre la polis y la esfera doméstica.
+                    </p>
+                `,
+                popups: [
+                    {
+                        title: "1.2 / Lo público y las políticas como conceptos (I)",
+                        content: `<p><strong>1.2 / Lo “público” y las “políticas” como conceptos</strong></p><p>La discusión sobre las políticas públicas debe comenzar con una clarificación conceptual de lo “público”, noción cuya transformación histórica ha determinado la forma en que se entiende el ámbito de intervención estatal. Lo público designa aquella dimensión de la actividad humana que requiere regulación colectiva o gubernamental, en contraste con lo privado, entendido como esfera doméstica o individual. Esta distinción, lejos de ser estable, ha sido objeto de tensión desde la antigüedad clásica.</p><p>En Grecia y Roma se establecieron distinciones fundacionales entre koinon/idion y res publica/res privata.</p>`
+                    },
+                    {
+                        title: "La mediación en la polis (Arendt y Aristóteles)",
+                        content: `<p>El análisis de Arendt, retomado por Saxonhouse (1983), presenta la oposición público/privado como polis/unidad doméstica, libertad/necesidad, igualdad/desigualdad, abierto/cerrado. Sin embargo, dicha dicotomía no fue homogénea; coexistieron múltiples conceptualizaciones de la tensión entre ambas esferas. Aristóteles intentó mediar el conflicto a través de la polis como forma superior de asociación.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.2",
+                sectionTitle: "Lo público y las políticas",
+                title: "El Siglo XIX: Mercado y Utilitarismo",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Economía Política (Smith)</h4>
+                            <p>El mercado armoniza intereses privados y públicos orgánicamente.</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Utilitarismo (Bentham/Mill)</h4>
+                            <p>El principio de la mayor felicidad y la noción de "perjuicio" a terceros.</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: La solución de la Economía Política</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: La erosión y el Utilitarismo</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "La Economía Política y Adam Smith",
+                        content: `<p>En el siglo XIX, la economía política formuló una solución duradera: el mercado como mecanismo capaz de armonizar intereses privados y públicos. Smith (1776) y los economistas políticos sostuvieron que la maximización del interés individual promovía el interés público, idea que Habermas (1989) vincula con la formación de la esfera pública burguesa. El Estado debía garantizar el marco legal, pero no interferir en la libertad económica. El orden emergía de la agregación de elecciones privadas. “Los argumentos clásicos de esta perspectiva se encuentran, por supuesto, plasmados en La riqueza de las naciones de Adam Smith (1776)” (p.38)</p>`
+                    },
+                    {
+                        title: "El Utilitarismo y la noción de Perjuicio",
+                        content: `<p>Este modelo comenzó a erosionarse hacia finales del siglo XIX, cuando nuevas problemáticas sociales ampliaron la noción de “perjuicio”, [“A la esfera de lo privado pertenecía aquello en lo que no se perjudicaba a otros (Mili, 1968)”], y legitimaron la intervención estatal en educación, salud y bienestar. El utilitarismo de Bentham y Mill introdujo el principio de la mayor felicidad como fundamento normativo de las políticas públicas.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.2",
+                sectionTitle: "Lo público y las políticas",
+                title: "El Nuevo Liberalismo y la Burocracia",
+                visual: `
+                    <p class="slide-synthesis">
+                        El mercado mostró insuficiencias que impulsaron el 
+                        <span class="clickable-text" onclick="openModal(0)">"nuevo liberalismo" (Dewey y Keynes)</span>, 
+                        fomentando una intervención estatal basada en conocimiento experto. 
+                        Paralelamente, este crecimiento del Estado demandó una vasta 
+                        <span class="clickable-text" onclick="openModal(1)">racionalización burocrática y separación política/administración</span>.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Keynes & Dewey</strong><br><small>Intervención Informada</small></div>
+                        <div class="diagram-arrow">↔</div>
+                        <div class="diagram-node"><strong>Expansión Burocrática</strong><br><small>Weber y Wilson</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "El Nuevo Liberalismo (Dewey y Keynes)",
+                        content: `<p>El “nuevo liberalismo”, representado por Dewey y Keynes, cuestionó la suficiencia autorreguladora del mercado. Dewey defendió la “inteligencia organizada” como instrumento para equilibrar intereses, mientras Keynes (1926; 1936) postuló un papel activo del Estado en la gestión económica.</p><p>El enfoque de las políticas públicas surgió en el marco del “nuevo liberalismo” impulsado por Dewey y Keynes, cuya aplicación práctica se expresó en el New Deal y en las reformas administrativas de la guerra. Según Lasswell (1971), la ciencia de las políticas públicas desarrollada en la posguerra constituyó una adaptación de ese enfoque, que concebía al Estado como responsable de administrar lo público y atender los problemas que el mercado no podía resolver. En este contexto, la clave radicaba en fortalecer los procesos de formulación y toma de decisiones mediante mayor información y conocimiento especializado.</p><p><strong>Cuadro: El nuevo liberalismo y los ámbitos de lo público y lo privado (p.42)</strong><br>Base doctrinal del nuevo liberalismo a partir de Keynes (1926, 1936), Dewey (1927) y Beveridge (1944). Keynes sostiene que el laissez-faire ya no resuelve la tensión entre egoísmo y socialismo, y propone que el Estado actúe apoyado en conocimiento experto. Afirma que deben reconocerse “entidades semiautónomas dentro del Estado cuyo único criterio de acción… es el bien público”. Asimismo, distingue entre servicios “técnicamente sociales” y aquellos “técnicamente individuales”, señalando que el gobierno debe intervenir cuando los individuos no puedan resolver problemas colectivamente.</p><p>Dewey, por su parte, plantea que la experimentación social permite descubrir técnicas que hagan el sistema capitalista “más eficiente” mediante una “gestión inteligente”. El análisis de políticas públicas emerge entonces como técnica orientada a mejorar la conducción racional del orden económico y social, desplazando el laissez-faire y fundando la legitimidad del Estado en la intervención informada.</p>`
+                    },
+                    {
+                        title: "Racionalización Burocrática y sus Críticos",
+                        content: `<p>Paralelamente, el crecimiento del Estado moderno se acompañó de la expansión burocrática descrita por Weber (1991: 196-252), quien interpretó la racionalización como rasgo constitutivo de la modernidad. Wilson (1887) defendió la distinción entre política y administración como garantía de neutralidad.</p><blockquote>el “nuevo liberalismo” se basaba en la creencia de que la administración publica era un medio más racional de fomentar el interés público... La idea de una forma de administración apolítica, racional y jerárquica era fundamental para la idea de democracia liberal (vease, por ejemplo, Mill, 1968). (p.40)</blockquote><p>No obstante, estudios posteriores cuestionaron la racionalidad plena de la burocracia (Simon, 1945; Lindblom, 1959), la supuesta orientación al interés público de los burócratas (Mueller, 1989); y la separación estricta entre política y administración (Appleby, 1949).</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.2",
+                sectionTitle: "Lo público y las políticas",
+                title: "Bienes Públicos y Semántica de la 'Policy'",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Teoría Económica</h4>
+                            <p>Bienes públicos (Samuelson) vs Bienes club (Buchanan).</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Semántica (1.2.1)</h4>
+                            <p><i>Policy</i> (Plan racional) vs <i>Politics</i> (Arte del poder).</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Nueva Derecha y Bienes Públicos</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: Evolución del término "Policy"</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "La Nueva Derecha y los Bienes Públicos",
+                        content: `<p>Sin embargo, la crisis económica de los años setenta revitalizó el liberalismo clásico bajo la “nueva derecha”. Hayek y Friedman argumentaron que la intervención estatal distorsionaba el mercado y que el interés público se promovía mejor expandiendo la libertad privada. Este giro implicó redefinir la frontera público/privado mediante mecanismos de mercado.</p><p>Desde la teoría económica, la distinción público/privado se reformuló como diferencia entre bienes públicos y privados. Samuelson (1954) definió los bienes públicos por su indivisibilidad y no exclusión. Buchanan (1968) introdujo la noción de bienes “club”, subrayando que la pureza del bien público es rara en la práctica. Así, las políticas públicas consisten en definir qué se considera público, quién lo financia y bajo qué criterios se distribuye.</p><p>El viraje del “nuevo” liberalismo a la “nueva derecha” en políticas publicas adquiere la desaparición del enfoque de la “administración pública” (pp.41-2)</p><p><strong>Cuadro : Pero, ¿qué es exactamente el sector público? (pp.44–45)</strong><br>El cuadro plantea que los economistas ofrecen uno de los marcos centrales para definir el sector público al analizar lo público y lo privado como “bienes”. Un bien público es aquel disponible para todos; los bienes públicos “puros” son producidos por el Estado, mientras que los bienes privados son consumidos por elección y excluyen a quienes no pagan. Samuelson (1954) identifica como rasgo distintivo de los bienes públicos su “indivisibilidad” y la imposibilidad de exclusión, en contraste con los bienes privados, definidos por su carácter excluyente y su financiamiento mediante precios de mercado. Los bienes públicos se financian con impuestos o endeudamiento.</p><p>No obstante, la dicotomía público/privado tiene límites. Buchanan (1968) cuestiona la pureza del bien público y propone la categoría de bienes “club”, que permiten exclusión mediante cuotas o tarifas, mostrando que el bien público “puro” está sujeto a “(crecientes) impurezas”. Así, las políticas públicas consisten en definir “qué puede considerarse público, quién lo suministra, quién y cómo lo paga y a quién se le paga”. Incluso un bien considerado público puede ser producido por una empresa privada, o su acceso puede restringirse por criterios normativos.</p><p>Musgrave (1959) introduce los bienes “preferentes”, cuyo acceso se distribuye según determinadas características o situaciones. Desde esta perspectiva, los sectores público y privado no son categorías separadas sino ámbitos que “se intersectan e interactúan”. Finalmente, Frey (1978) sostiene que existe un “ciclo en la demanda de bienes públicos y privados”... El sector público no es una categoría fija, sino una combinación variable de bienes públicos, privados y racionados que se redefine históricamente.</p>`
+                    },
+                    {
+                        title: "Evolución semántica de la política",
+                        content: `<p><strong>1.2.1, el autor examina la evolución semántica del término “políticas”.</strong></p><p>Heclo (1972) señala que el concepto ocupa un nivel intermedio entre decisiones individuales y grandes movimientos sociales e implica intención. Dror (1989) vincula la formulación de políticas con la elección consciente entre alternativas sociales. El significado moderno de policy, consolidado en la posguerra, remite a un plan racional orientado a objetivos, diferenciándose de politics.</p><p>Hogwood y Gunn (1984) identifican múltiples acepciones contemporáneas del término, desde programa y decisión hasta proceso e impacto. Históricamente, la palabra tuvo connotaciones maquiavélicas —prudencia, astucia, arte del poder— visibles en Shakespeare. Con la institucionalización democrática, las políticas adquirieron un sentido neutral asociado a la racionalidad y la legitimidad. Schumpeter (1974) interpretó las plataformas partidarias como productos ofrecidos en competencia electoral. Lasswell (1951b) defendió el uso del término “políticas” para evitar las connotaciones negativas de “político”.</p><p>En consecuencia, disponer de una política significa ofrecer razones racionales para actuar o no actuar. En las democracias liberales modernas, la legitimidad gubernamental se articula a través del discurso de las políticas, entendido como intento de estructurar racionalmente la acción pública frente a problemas definidos colectivamente.</p><p><strong>Cuadro: Textos clave (p.36)</strong><br>Benn y Gaus (1983) abordan directamente la distinción entre lo público y lo privado en la vida social; Habermas (1989) analiza la “transformación estructural de la esfera pública”, mostrando su constitución histórica; y Gunn (1989) examina los conceptos de “opinión pública” e “interés público” como categorías centrales en la teoría política moderna.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.2",
+                sectionTitle: "Lo público y las políticas",
+                title: "Perspectivas Críticas y Simbolismo",
+                visual: `
+                    <p class="slide-synthesis">
+                        Definir el límite de lo público no es un mero ejercicio teórico; es un acto de poder. 
+                        La <span class="clickable-text" onclick="openModal(0)">crítica feminista de Pateman y Beuret</span> 
+                        expone cómo la distinción invisibiliza estructuras de dominio. Por otra parte, 
+                        la visión teatral nos recuerda que <span class="clickable-text" onclick="openModal(1)">la política es también simulación (Marlowe)</span>.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Estructura Normativa</strong><br><small>Oculta poder patriarcal</small></div>
+                        <div class="diagram-arrow">↔</div>
+                        <div class="diagram-node"><strong>Construcción de Sentido</strong><br><small>Gestión de la percepción pública</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Críticas Feministas: Lo público según quién",
+                        content: `<p><strong>Cuadro: ¿Lo público según quién? (pp.45–46)</strong><br>Críticas feministas que cuestionan la neutralidad de la dicotomía público/privado y sostienen que la esfera pública ha sido definida históricamente desde parámetros masculinos. Desde las décadas de 1970 y 1980, estas críticas señalan que la formulación de políticas públicas ha estado circunscrita a aquello que los hombres reconocen como dominio público.</p><p>Carole Pateman (1983) sostiene que la distinción liberal entre lo privado y lo público constituye “el tema primordial del movimiento feminista” y que no se trata de una simple diferenciación funcional, sino de una estructura normativa que oculta relaciones de poder. Afirma que el liberalismo “está estructurado a partir de relaciones patriarcales y de clase” y que la dicotomía “oculta la sumisión de las mujeres a los hombres dentro de un orden aparentemente universal e individualista de igualdad”. La esfera pública se presenta como independiente de la privada, pero esa separación invisibiliza las relaciones domésticas que sostienen el orden político.</p><p>Kristie Beuret (1991), a partir de datos empíricos sobre transporte, demuestra que la falta de sistemas adecuados limita las oportunidades laborales femeninas y restringe su vida social y familiar. Propone que las mujeres participen en la definición de agendas de transporte y plantea medidas como mejorar la seguridad, abaratar el servicio y adaptarlo a necesidades específicas. El problema del transporte revela cómo asuntos considerados privados afectan estructuralmente la igualdad pública.</p><p>Jan Pahl (1985) muestra que la violencia doméstica fue excluida de la agenda pública al considerarse parte de la esfera privada. La manera en que los varones definen la privacidad, sostiene, revela relaciones de poder y patrones de indefensión social.</p><p>Finalmente, Meehan y Svenhuljsen (1991) compilan estudios europeos sobre políticas de equidad de género, evidenciando el impacto estructural de la dicotomía público/privado en la formulación de políticas. En conjunto, el cuadro demuestra que definir qué es “público” implica decisiones políticas atravesadas por relaciones de género y poder.</p>`
+                    },
+                    {
+                        title: "El Oficio de las Políticas (Simbolismo)",
+                        content: `<p><strong>Cuadro: El oficio de las políticas (final p.48–inicio 49)</strong><br>En Christopher Marlowe, particularmente en El judío de Malta, la palabra “políticas” adquiere centralidad conceptual y aparece incluso como figura dramatizada. Barrabás responde a la caracterización de “simples políticas” afirmando: “Sí, políticas, ésa es su profesión, y no la simplicidad como lo sugieren”. En esta obra, políticas posee un doble significado: puede parecer simple, pero en realidad es intrigante y estratégica. Implica construir una historia verosímil que garantice el éxito del confabulador; es, en esencia, la “interpretación de un papel”.</p><p>La afirmación de Ithamore —“El significado tiene un significado”— refuerza la idea de que la política es cálculo simbólico. Barrabás no obtiene “un simple lugar” como gobernador, sino que manipula antagonismos (turco/cristiano) para obtener “ganancia”. Aquí, política significa astucia instrumental orientada al provecho.</p><p>En contraste contemporáneo, Jonathan Lynn y Antony Jay en Yes Prime Minister (1987) muestran cómo una política puede reducirse a una operación de apariencia. Sir Humphrey observa que el Primer Ministro “sólo está tratando de aparentar que trata de reducir las cifras del desempleo”, preocupado más por la imagen de acción que por la acción misma. La política se convierte así en gestión de percepción pública.</p><p>En conjunto, el cuadro evidencia que, antes de consolidarse como categoría técnica racional, policy estaba asociada a estrategia, simulación y representación del poder, donde la construcción de sentido y apariencia era parte constitutiva del ejercicio político.</p><p><strong>Cuadro: ¿Cuáles son las diferencias entre el sector público y el sector privado? (p.43–inicio 44)</strong><br>W.F. Baber (citado en Massey, 1993:15) sostiene que el sector público presenta “diez diferencias clave” frente al sector privado. Entre ellas destacan: asumir “tareas más complejas y ambiguas”, enfrentar mayores dificultades de implementación, emplear personas con motivaciones diversas, preocuparse por asegurar oportunidades, compensar fallas del mercado y participar en actividades simbólicamente relevantes. Además, está sujeto a normas más estrictas de legalidad... Desde la perspectiva de las organizaciones no lucrativas, Anthony y Herzlinger (1980:31) afirman que “las decisiones de la administración están diseñadas para proporcionar los mejores servicios posibles... y su éxito se mide por el servicio prestado y no por la ganancia.</p>`
+                    }
+                ]
+            },
+
+            // ================= SECCIÓN 1.3 =================
+            {
+                section: "1.3",
+                sectionTitle: "Evolución del enfoque",
+                title: "La Racionalización del Estado Moderno",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Paradigma Newtoniano</h4>
+                            <p>Búsqueda de leyes generales y medición empírica aplicada a la sociedad (gobierno erudito).</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Influencia de Entreguerras</h4>
+                            <p>Las ideas y la teoría económica deben fundamentar la acción estatal (Keynes).</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: El modelo de las ciencias naturales</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: La influencia económica de Keynes</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "El modelo newtoniano y la racionalización",
+                        content: `<p><strong>1.3 / La evolución del enfoque de las políticas públicas (pp. 50–63)</strong></p><p>La evolución del análisis de políticas públicas debe entenderse en el contexto de la racionalización del Estado moderno y del desarrollo de las ciencias sociales como instrumentos para intervenir en la realidad social. El surgimiento de métodos inspirados en las ciencias naturales configuró un modelo de conocimiento basado en leyes generales, medición y regularidad empírica. Como señala Miller (1984), este enfoque descansaba en el supuesto de que el comportamiento humano podía analizarse mediante patrones estables comparables en el tiempo y el espacio.</p><p>La herencia de la Ilustración alimentó la idea de que los problemas sociales podían resolverse mediante el uso sistemático de la razón. El modelo newtoniano se convirtió en paradigma de lo que era posible lograr con conocimiento aplicado a la sociedad. De este modo, el análisis de políticas públicas se vinculó con la aspiración de un “gobierno erudito”, capaz de formular soluciones mejores a partir de información rigurosa.</p><p>Max Weber (1991) identificó este proceso como parte de la racionalización propia de la modernidad industrial. La expansión de la burocracia representó la institucionalización de procedimientos racionales para administrar el Estado. La separación entre formulación política y administración burocrática emergió como mecanismo para asegurar eficiencia y neutralidad.</p>`
+                    },
+                    {
+                        title: "Las ciencias sociales y entreguerras",
+                        content: `<p>Durante la primera mitad del siglo XX, especialmente en el periodo de entreguerras, las ciencias sociales comenzaron a establecer una relación más estrecha con el gobierno. Economistas como Keynes (1936) defendieron la necesidad de fundamentar la acción estatal en teoría económica rigurosa, sosteniendo que las ideas —más que los intereses— acabarían influyendo en las decisiones públicas. La formulación de políticas pasó a concebirse como actividad que requería conocimiento especializado y análisis sistemático.</p><p>El desplazamiento decisivo hacia un enfoque unificado del estudio de problemas públicos ocurrió en Estados Unidos, donde se consolidó la idea de una “ciencia de las políticas públicas”. Este enfoque buscaba integrar métodos empíricos, análisis interdisciplinario y orientación práctica hacia la resolución de problemas. El análisis dejó de limitarse a describir instituciones y comenzó a concentrarse en procesos de decisión, resultados y efectos.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.3",
+                sectionTitle: "Evolución del enfoque",
+                title: "La Bifurcación Lasswelliana",
+                visual: `
+                    <p class="slide-synthesis">
+                        El viraje hacia un enfoque unificado ocurre en Estados Unidos con la figura de Lasswell. 
+                        Este autor divide la ciencia analítica en dos vertientes: 
+                        <span class="clickable-text" onclick="openModal(0)">El análisis EN y PARA el proceso de decisión</span> (prescriptivo) y 
+                        <span class="clickable-text" onclick="openModal(1)">el análisis ACERCA DEL proceso</span> (descriptivo-teórico).
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Análisis EN/PARA</strong></div>
+                        <div class="diagram-arrow">VS</div>
+                        <div class="diagram-node"><strong>Análisis ACERCA DE</strong></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "El desplazamiento hacia el enfoque unificado",
+                        content: `<p>Fue en Estados Unidos donde se registró un desplazamiento hacia un enfoque más unificado para el estudio de los problemas públicos y las políticas públicas a partir de la obra de Harold Lasswell (p.51).</p><p>Así las cosas, la evolución del enfoque de políticas públicas refleja la transformación del Estado moderno: de un aparato administrativo centrado en reglas formales a un sistema que pretende fundamentar su legitimidad en la capacidad de diagnosticar problemas y producir soluciones informadas.</p>`
+                    },
+                    {
+                        title: "La Bifurcación del Conocimiento",
+                        content: `<p><strong>1. La bifurcación del conocimiento en las políticas públicas</strong></p><p>De acuerdo con la propuesta fundamental de Harold Lasswell (1970a), la disciplina se estructuró tempranamente en torno a dos grandes enfoques que definen la relación entre el saber y la acción gubernamental:</p><p><strong>Análisis de las políticas públicas:</strong> Centrado en el conocimiento <em>en y para</em> el proceso. Posee una orientación aplicada y busca mejorar la toma de decisiones.</p><p><strong>Análisis del proceso de las políticas públicas:</strong> Orientado al conocimiento <em>acerca de</em> cómo se formulan e implementan las políticas, manteniendo una perspectiva más descriptiva y teórica sobre el funcionamiento del sistema político.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.3",
+                sectionTitle: "Evolución del enfoque",
+                title: "Posguerra y el Enfoque de Resolución",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Segunda Guerra Mundial</h4>
+                            <p>Investigación de Operaciones (IO) y traslado de gestión empresarial (McNamara).</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Años 60s (Great Society)</h4>
+                            <p>Ingeniería social y el gobierno como solucionador de problemas mecánicos.</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Orígenes Bélicos y McNamara</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: La Gran Sociedad y su crítica</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Raíces históricas y contexto de posguerra",
+                        content: `<p><strong>2. Raíces históricas y contexto de posguerra</strong></p><p>El análisis de las políticas públicas tiene sus cimientos en la experiencia de la Segunda Guerra Mundial, nutriéndose principalmente de dos fuentes:</p><p>La Investigación de Operaciones (IO): Desarrollada en Gran Bretaña y Estados Unidos para optimizar decisiones bélicas.</p><p>Técnicas de análisis económico y gestión empresarial: Influencias que se consolidaron en la década de 1960 a través de figuras como Robert McNamara (Secretario de Defensa de Kennedy), quien personificó la transferencia de métodos corporativos al sector público.</p>`
+                    },
+                    {
+                        title: "La Gran Sociedad y la Crítica Cultural",
+                        content: `<p><strong>3. La era de la "Gran Sociedad" y el enfoque de resolución de problemas</strong></p><p>Hacia finales de los años 60, en el contexto de las administraciones de Kennedy y Johnson en Estados Unidos (New Frontier y Great Society), el gobierno comenzó a ser visto como un "ente resolvedor de problemas". Esto impulsó una demanda creciente de análisis en sectores como salud, educación y transporte.</p><p>Terminología y consolidación: Según Meltsner (1976: 2), términos como "análisis de políticas públicas" fueron popularizados por Dror (1967) en documentos gubernamentales del Congreso de EE. UU. (1969), aunque Meltsner atribuye su primer uso a Charles Lindblom en 1958.</p><p>La filosofía del análisis: Wildavsky (1979) describió esta práctica como el acto de "hablarle al poder con la verdad", bajo la premisa de que las ciencias sociales actúan como una forma de ingeniería capaz de mejorar la sociedad.</p><p>Crítica cultural del modelo: Keith Hope (citado en Sharpe, 1975: 15) señala que en la cultura estadounidense existe una tendencia a ver situaciones sociales como "problemas" que pueden ser "resueltos" y "desechados" mediante "programas", intentando alcanzar metas sociales ambiciosas sin transitar necesariamente por las etapas tradicionales del Estado de bienestar.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.3",
+                sectionTitle: "Evolución del enfoque",
+                title: "Los Pilares Teóricos del Proceso",
+                visual: `
+                    <p class="slide-synthesis">
+                        Mientras unos resolvían problemas técnicos, otro grupo teorizaba el proceso. 
+                        <span class="clickable-text" onclick="openModal(0)">Simon introdujo la racionalidad limitada y Lindblom el incrementalismo</span>. 
+                        Para englobar todo, <span class="clickable-text" onclick="openModal(1)">Easton y Almond proveyeron el Enfoque Sistémico y Funcionalista</span>.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>H. Simon</strong><br><small>Etapas Racionales</small></div>
+                        <div class="diagram-arrow">+</div>
+                        <div class="diagram-node"><strong>D. Easton</strong><br><small>Flujos Sistémicos</small></div>
+                        <div class="diagram-arrow">=</div>
+                        <div class="diagram-node"><strong>Ciencia Normal</strong><br><small>Años 70s</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Simon y Lindblom: Racionalidad vs Incrementalismo",
+                        content: `<p><strong>4. Autores clave y el giro hacia el proceso</strong></p><p>Mientras un sector se enfocaba en resolver problemas, otro grupo de académicos comenzó a analizar el proceso político como una alternativa al estudio tradicional de las leyes y las instituciones. Parsons destaca a cuatro pensadores fundamentales en este desarrollo:</p><p>Harold Lasswell: Considerado el espíritu impulsor de la disciplina... pionero en proponer el modelo de "etapas" del proceso de políticas (Lasswell, 1956).</p><p><strong>1. Herbert Simon: La Racionalidad Limitada y Secuencial</strong><br>La influencia de Herbert Simon es transversal a múltiples disciplinas, desde la economía hasta la informática. Su eje central es la toma de decisiones humana, la cual analiza bajo el concepto de racionalidad "limitada", reconociendo las restricciones cognitivas del individuo pero manteniendo una fe en su capacidad de mejora. Para el análisis de políticas, la mayor herencia de Simon es la fragmentación de la toma de decisiones en una secuencia de etapas racionales: inteligencia, diseño y elección. Este esquema se convirtió en el núcleo del análisis de políticas públicas, permitiendo un abordaje metódico de los problemas gubernamentales.</p><p><strong>2. Charles Lindblom: La Crítica Incrementalista</strong><br>Frente al modelo racional de Simon, surge la figura de Charles Lindblom, cuyo artículo de 1959 sobre "la ciencia de salir del paso" (the science of muddling through) se erige como un clásico fundacional. Lindblom rechazó la idea de que el proceso de políticas pudiera entenderse como una serie de pasos ordenados o etapas funcionales. El proceso interactivo: Según Lindblom y Woodhouse (1993: 11), la formulación de políticas carece de un principio y un fin definidos; es, más bien, un proceso "complejamente interactivo" que no se ajusta a retratos lineales. Fuerzas estructurales: Lindblom instó a mirar más allá de las instituciones formales para considerar las "fuerzas más profundas" que distorsionan el proceso, tales como el poder corporativo, la inequidad y las limitaciones propias del análisis humano (Lindblom, 1968).</p>`
+                    },
+                    {
+                        title: "Easton y el Enfoque Sistémico",
+                        content: `<p><strong>3. David Easton y el Enfoque Sistémico</strong><br>A pesar de no ser una obra estrictamente de "políticas públicas", los trabajos de David Easton (1953 y 1965) proporcionaron el marco conceptual para entender la relación entre el gobierno y su entorno. Su modelo de "sistema político" introdujo conceptos clave: Inputs e Insumos: Flujos provenientes del entorno (demandas y apoyos) mediados por partidos, medios y grupos de interés. Outputs e Impactos: La conversión de dichas demandas en resultados y productos de política pública. Esta visión sistémica, al combinarse con el enfoque de etapas de Lasswell y Simon, dio origen a lo que Parsons denomina la "ciencia normal" del análisis de políticas, consolidada en libros de texto de autores como Jones (1970), Frohock (1979), Dye (1972) y Sharkansky (1970).</p><p><strong>4. Desarrollos Estructural-Funcionalistas: Almond y Deutsch</strong><br>En la década de 1960, otros modelos sistémicos ganaron relevancia, destacando los de G.A. Almond y Powell (1966). Su modelo desglosa el sistema en: Funciones de proceso: Articulación y agregación de intereses, formulación, implementación y adjudicación. Funciones de política: Extracción, regulación y distribución. Hacia 1993, Almond et al. reconocieron la importancia de las instituciones y normas, distanciándose de la tendencia previa de las ciencias sociales de ignorar el peso de las constituciones, una crítica también sostenida por el "nuevo institucionalismo" de March y Olsen (1989).</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.3",
+                sectionTitle: "Evolución del enfoque",
+                title: "Alternativas y la Expansión Global",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Alternativas Globales</h4>
+                            <p>Vickers (Valores vs Realidad) y Dror (Racionalismo modificado).</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Consolidación y Terapia</h4>
+                            <p>El analista como mediador interdisciplinario y "terapeuta social".</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Voces Críticas e Internacionalización</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: La Consolidación y la "Terapia Pública"</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Alternativas a EE.UU. e Internacionalización",
+                        content: `<p><strong>5. Perspectivas Alternativas: Vickers y Dror</strong><br>Fuera del predominio estadounidense, Parsons identifica voces críticas y complementarias: Sir Geoffrey Vickers (Reino Unido): Propuso una síntesis entre psicología, cibernética y política. Su obra subraya la importancia de los juicios de valor en interacción con los juicios de realidad, alejándose de la visión puramente técnica de la administración. Yehezkel Dror (Israel): En su obra Public Policy-making Re-examined (1968), Dror se opuso al incrementalismo de Lindblom, abogando por un "racionalismo modificado" o científico. Dror fue pionero en señalar la insensibilidad de los modelos occidentales ante las realidades del mundo en desarrollo.</p><p><strong>Institucionalización, Interdisciplinariedad y la Expansión Global</strong><br>1. La Formalización de un Campo Académico Independiente: El nacimiento de las políticas públicas como una disciplina con autonomía propia se sitúa a finales de la década de 1960. Un hito fundamental fue la compilación de documentos realizada por Austin Ranney (1968)... 2. La Promesa de una Ciencia Social Unificada: Durante la década de 1970, el análisis... se creía que podría actuar como puente interdisciplinario. No obstante, el debate reveló un profundo escepticismo... 3. El Auge de los Think-Tanks... Las décadas de 1970 y 1980 presenciaron una explosión de think-tanks... 4. La Descentralización del Conocimiento: El Aporte Europeo... Parsons destaca un cambio significativo hacia las décadas de 1980 y 1990: la expansión y el protagonismo de enfoques innovadores provenientes de Europa (Kooiman 1993, Lane 1990).</p>`
+                    },
+                    {
+                        title: "Consolidación de Lasswell y la Terapia Pública",
+                        content: `<p><strong>Cuadro. La Visión Fundacional de Lasswell: Ciencia, Valores y Democracia</strong><br>Para Lasswell, la ciencia de las políticas públicas no es una disciplina aislada, sino una convergencia de saberes orientada a la acción. Según su perspectiva, las ciencias se integran a este campo cuando logran aclarar el proceso de formulación de políticas o cuando aportan datos críticos para emitir juicios racionales sobre los problemas de la sociedad (Lasswell, 1948b: 122). El analista como actor comprometido... El enfoque de la "Dignidad Humana"... Fin Último: La meta definitiva de la ciencia de las políticas públicas es el enriquecimiento de la democracia y la realización de la dignidad humana...</p><p><strong>Cuadro. La Consolidación de la Ciencia de las Políticas (1970)</strong><br>En su artículo fundacional para el primer número de la revista Policy Sciences, Lasswell (1970a) sistematizó la madurez de este campo académico. Su tesis central es que la ciencia de las políticas públicas posee una perspectiva distintiva centrada en la orientación hacia los problemas, lo que exige tres características fundamentales: Contextualidad, Multimetodología y Multidisciplinariedad. El Analista como Integrador y Mediador...</p><p><strong>El Análisis de Políticas como "Terapia Pública"</strong><br>Una de las interpretaciones más profundas sobre la función del analista es la que propone Merelman (1981), quien establece una analogía entre el científico de políticas y el psicoterapeuta. Bajo esta óptica, el análisis de políticas opera como una forma de medicina social: Resolución de conflictos... La autoterapia del científico... Neutralización del poder: Este aprendizaje desdibuja el "ansia de poder" del científico. En palabras de Merelman, el científico de políticas es un "médico social" que se cura a sí mismo mientras aprende a sanar al sistema de gobierno (Merelman, 1981: 496).</p>`
+                    }
+                ]
+            },
+
+            // ================= SECCIÓN 1.4 =================
+            {
+                section: "1.4",
+                sectionTitle: "Analistas y Naturaleza",
+                title: "Un Campo Definido por el Problema",
+                visual: `
+                    <p class="slide-synthesis">
+                        El campo de las Políticas Públicas carece de fronteras disciplinares rígidas. 
+                        Como observó Wildavsky, la identidad de esta materia está dictada por 
+                        <span class="clickable-text" onclick="openModal(0)">la naturaleza del problema a resolver</span>. 
+                        Esto evoca poderosamente a la <span class="clickable-text" onclick="openModal(1)">metáfora geográfica de Metternich</span>.
+                    </p>
+                    <div style="text-align:center; padding: 2rem; border: 2px dashed var(--gris-pizarra); border-radius: 10px;">
+                        <h3 style="margin-bottom: 1rem;">La Metáfora Histórica</h3>
+                        <p style="font-size: 1.1rem; color: var(--gris-pizarra);">
+                            "Italia es una expresión geográfica..." (Metternich)
+                        </p>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Un campo definido por el problema",
+                        content: `<p><strong>1.4 Tipos de Analistas y Naturaleza del Análisis de Políticas Públicas</strong></p><p><strong>1. Un campo definido por el problema, no por la disciplina</strong></p><p>Esta orientación hacia problemas comunes otorga un objetivo compartido a diversas áreas como la ciencia política, la economía, la filosofía, la psicología y la sociología. Además de estos enfoques, el análisis requiere una comprensión profunda de los contextos históricos, legales, antropológicos y geográficos, así como del impacto de las técnicas cuantitativas y la informática en el diseño gubernamental.</p>`
+                    },
+                    {
+                        title: "La Metáfora de Metternich y Wildavsky",
+                        content: `<p>Parsons recurre a una analogía histórica citando al príncipe Metternich, quien describió a Italia como una "expresión geográfica" compuesta por regiones dispersas. De manera similar, el análisis de políticas públicas es un campo diverso que integra múltiples disciplinas, teorías y modelos. En palabras de Wildavsky (1979: 15), este es un subcampo aplicado cuyos contenidos no están dictados por fronteras académicas rígidas, sino por "aquello que parece adecuado según las circunstancias de la época y la naturaleza del problema".</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.4",
+                sectionTitle: "Analistas y Naturaleza",
+                title: "Inquietudes Fundamentales del Analista",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>El Problema y el Actor</h4>
+                            <p>La relación causal y el comportamiento de los tomadores de decisiones.</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>El Proceso y el Impacto</h4>
+                            <p>Análisis de insumos agregados y la evaluación post-intervención.</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Conciencia Crítica</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: Ejes de Inquietud</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Conciencia Crítica en la Formación",
+                        content: `<p><strong>2. Perfil y funciones del analista de políticas</strong></p><p>El analista debe poseer una conciencia crítica sobre los diversos marcos de análisis u ópticas que pueden influir en la interpretación de los datos.</p>`
+                    },
+                    {
+                        title: "Ejes y áreas de interés compartido",
+                        content: `<p>Los analistas comparten inquietudes fundamentales, tales como:</p><ul><li>El estudio de los problemas públicos y su relación con las políticas.</li><li>El contenido de las políticas y el comportamiento de los tomadores de decisiones.</li><li>El análisis de los insumos, procesos y las consecuencias (resultados e impactos) de las intervenciones estatales.</li></ul>`
+                    }
+                ]
+            },
+            {
+                section: "1.4",
+                sectionTitle: "Analistas y Naturaleza",
+                title: "Los 5 Roles del Analista",
+                visual: `
+                    <p class="slide-synthesis">
+                        Basado en el trabajo temprano de Lasswell, el académico Merelman (1981) sistematizó 
+                        <span class="clickable-text" onclick="openModal(0)">cinco roles o "tipos dominantes"</span> 
+                        que los analistas adoptan frente al gobierno y la sociedad civil. Desde el "médico" hasta el "ingeniero". 
+                        <span class="clickable-text" onclick="openModal(1)">Explorar listado completo</span>.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node">Médico / Ingeniero</div>
+                        <div class="diagram-arrow">...</div>
+                        <div class="diagram-node">Defensor / Estudiante</div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Sistematización de Roles (Merelman / Lasswell)",
+                        content: `<p>Merelman (1981: 492), basándose en la obra de Harold Lasswell, clasifica a los analistas en cinco roles o "tipos" dominantes.</p>`
+                    },
+                    {
+                        title: "Los 5 Tipos Dominantes",
+                        content: `<p>La clasificación identifica los siguientes cinco roles:</p><ul><li><strong>El médico de la personalidad política</strong> (Lasswell, 1948a).</li><li><strong>El ingeniero social</strong> (Lasswell, 1963, 1971).</li><li><strong>El recopilador de inteligencia</strong> (Lasswell, 1935).</li><li><strong>El defensor de las políticas públicas</strong> (Lasswell, 1948a).</li><li><strong>El estudiante de administración pública</strong> (Lasswell, 1930a).</li></ul>`
+                    }
+                ]
+            },
+            {
+                section: "1.4",
+                sectionTitle: "Analistas y Naturaleza",
+                title: "Ámbitos Institucionales de Actuación",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Academia y Think-Tanks</h4>
+                            <p>Investigación teórica vs análisis bajo contrato interdisciplinario.</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Estado y Lobbies</h4>
+                            <p>Inteligencia burocrática interna vs consultores por honorarios.</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Entornos de Investigación</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: Grupos de Interés y Burocracia</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Universidades y Think-tanks",
+                        content: `<p><strong>3. Ámbitos Institucionales de Actuación</strong></p><p>Los analistas no operan en el vacío, sino que se distribuyen en diversos entornos profesionales:</p><ul><li><strong>Universidades:</strong> Académicos enfocados en la investigación y la obtención de fondos concursables.</li><li><strong>Think-tanks e instituciones independientes:</strong> Personal especializado que trabaja en investigaciones bajo contrato.</li></ul>`
+                    },
+                    {
+                        title: "Unidades Internas y Consultores (Lobbies)",
+                        content: `<p>La operación gubernamental y el sector privado también absorben masivamente a estos profesionales:</p><ul><li><strong>Unidades internas de políticas:</strong> Analistas dentro del gobierno responsables de la inteligencia y la investigación para agencias públicas.</li><li><strong>Grupos de presión, partidos políticos y consultores independientes:</strong> Actores que buscan influir en la agenda o brindar servicios especializados por honorarios determinados.</li></ul>`
+                    }
+                ]
+            },
+            {
+                section: "1.4",
+                sectionTitle: "Analistas y Naturaleza",
+                title: "Fases y Sectores Eclécticos",
+                visual: `
+                    <p class="slide-synthesis">
+                        El perfil académico es sumamente variado (abogados, geógrafos, ecólogos). Debido a esta complejidad, 
+                        la profesión suele estructurarse operativamente de dos formas: por <span class="clickable-text" onclick="openModal(0)">sectores o áreas sustantivas</span>, 
+                        y por <span class="clickable-text" onclick="openModal(1)">fases específicas del ciclo de las políticas</span>.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Fragmentación Sectorial</strong></div>
+                        <div class="diagram-arrow">vs</div>
+                        <div class="diagram-node"><strong>Fragmentación por Etapas</strong></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Fragmentación Sectorial Sustantiva",
+                        content: `<p><strong>4. Áreas y Fases de Concentración</strong></p><p>El perfil profesional del analista es sumamente variado, proviniendo de esferas tan diversas como el derecho, la geografía o las ciencias ambientales. El campo suele fragmentarse por sectores específicos, donde se generan redes de investigación especializadas:</p><p><strong>Sectores clave:</strong> Salud, transporte, educación, medio ambiente, política social, vivienda, política económica, temas raciales y planeación urbana.</p>`
+                    },
+                    {
+                        title: "Fragmentación por Etapas del Ciclo",
+                        content: `<p>Finalmente, los analistas pueden concentrar sus esfuerzos en diferentes momentos del ciclo de políticas. Algunos se especializan en la definición de la agenda y el papel de los grupos de interés; otros analizan el peso de la burocracia en la toma de decisiones o la labor de los profesionales en la ejecución; mientras que un grupo considerable se enfoca específicamente en las etapas de formulación, implementación o evaluación.</p>`
+                    }
+                ]
+            },
+
+            // ================= SECCIÓN 1.5 =================
+            {
+                section: "1.5",
+                sectionTitle: "Marcos y Aprendiz de Todo",
+                title: "La Epistemología de los 'Marcos' (Frames)",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Construcción de Realidad</h4>
+                            <p>Los "marcos" establecen límites para dotar de coherencia al análisis (Rein y Schön).</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Arte y Oficio</h4>
+                            <p>Requiere ejercicios experimentales de pensamiento, no solo técnica pura (Wildavsky).</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Los marcos y Rein/Schön</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: Wildavsky y Hogwood</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "El concepto de 'Marco' (Frame)",
+                        content: `<p><strong>1.5 Pluralidad de Marcos y el Perfil del "Aprendiz de Todo"</strong></p><p>El autor explica que la idea de organizar el pensamiento a través de "marcos" (o frames) cobró fuerza en las décadas de 1970 y 1980 como modos de dar coherencia y límites a la realidad analizada. Los marcos funcionan como modos de organización que otorgan forma y coherencia a los problemas, construyendo un límite alrededor de una realidad compartida por una comunidad o grupo. No obstante, esta delimitación no está exenta de tensiones, ya que pueden surgir conflictos tanto dentro de un mismo marco como entre marcos distintos. Según Rein y Schön (1993), estos marcos definen cómo se discuten los problemas y cómo estos pueden chocar o converger.</p>`
+                    },
+                    {
+                        title: "El Análisis como Arte y Oficio",
+                        content: `<p>En este contexto, Wildavsky (1979: 16-17) define el análisis como una combinación de arte y oficio, que requiere "ejercicios experimentales de pensamiento" y creatividad. (p.66) Esta visión es complementada por Brian Hogwood (1984: 25), quien propone que el analista debe aspirar a ser un "aprendiz de todo". Esto implica ser una persona con una formación amplia que, sin ser necesariamente experta en una sola área, posea la habilidad de identificar y aplicar técnicas relevantes, comprendiendo sus fortalezas y debilidades para auxiliar a quienes toman decisiones.</p><p><strong>Los Marcos de Análisis Fundamentales</strong><br>Parsons recupera la clasificación de Bobrow y Dryzek (1987), quienes identifican cinco marcos principales, a los que el autor añade tres adicionales: el proceso político, la política comparada y el gerencial.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.5",
+                sectionTitle: "Marcos y Aprendiz de Todo",
+                title: "Marco 1: Economía del Bienestar y Public Choice",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Economía del Bienestar</h4>
+                            <p>Derivada de Bentham/Mill. Maximizar racionalidad/utilidad (Quade, Stokey).</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Public Choice</h4>
+                            <p>Economía aplicada a decisiones fuera del mercado. Burocracia y rent-seeking (Niskanen, Downs, Ostrom).</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Economía de Bienestar</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: Elección Pública</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.5.1/ La economía de bienestar",
+                        content: `<p><strong>1.5.1/ La economía de bienestar (p. 67)</strong></p><p>La economía del bienestar constituye un componente central derivado del utilitarismo de Mill y Bentham. Este paradigma busca mejorar la racionalidad y eficacia en la toma de decisiones, siendo revisado por autores como Quade (1976), Stokey y Zeckhauser (1978) y Carley (1980).</p>`
+                    },
+                    {
+                        title: "1.5.2/ La elección pública",
+                        content: `<p><strong>1.5.2/ La elección pública (p. 68)</strong></p><p>Por otro lado, el enfoque de la elección pública (public choice) es definido por Mueller (1979: 1) como "la economía de la toma de decisiones fuera del mercado" o la aplicación de la metodología económica a las ciencias políticas. Entre sus exponentes clave figuran Niskanen (1971) con su estudio sobre la burocracia, y Anthony Downs (1957, 1967) con su teoría económica de la democracia. Este marco se vincula estrechamente con el nuevo institucionalismo económico, que analiza el comportamiento de las organizaciones basándose en teorías de la elección racional, con obras destacadas de Moe (1984), Ostrom (1982), Stiglitz (1987) y North (1990).</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.5",
+                sectionTitle: "Marcos y Aprendiz de Todo",
+                title: "Marco 2 y 3: Estructura Social e Información",
+                visual: `
+                    <p class="slide-synthesis">
+                        El enfoque sociológico (<span class="clickable-text" onclick="openModal(0)">Estructura Social</span>) influyó en ver las etapas como el "ciclo de vida" del problema. 
+                        Por su parte, el <span class="clickable-text" onclick="openModal(1)">Procesamiento de la Información</span> introduce la psicología cognitiva y cuestiona la racionalidad analítica pura (Simon, Janis, Argyris).
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Sociología</strong><br><small>Construcciones colectivas.</small></div>
+                        <div class="diagram-arrow">+</div>
+                        <div class="diagram-node"><strong>Psicología Cognitiva</strong><br><small>Mente Organizacional</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.5.3/ La estructura social",
+                        content: `<p><strong>1.5.3/ La estructura social (p. 68)</strong></p><p>El enfoque del «ciclo de vida» para los problemas sociales, derivado de Fuller y Myers (1941), ha sido una fuente importante para el modelo «por etapas» del proceso de las políticas públicas. Además, los sociólogos han aportado significativamente a la comprensión del poder, las organizaciones, las instituciones y la sociología del conocimiento. A un nivel general, la sociología «funcionalista» de Parsons (1937, 1951) ha ejercido una influencia predominante en el enfoque «sistémico» del proceso de las políticas, tal como se observa en los trabajos de Easton (1953, 1965) y Almond y Powell (1966). Finalmente, se reconoce que el impacto sociológico ha sido tanto «directo» como «indirecto», citando a Bulmer (1990).</p>`
+                    },
+                    {
+                        title: "1.5.4/ El procesamiento de la información",
+                        content: `<p><strong>1.5.4/ El procesamiento de la información (Pág. 69)</strong></p><p>Es el marco más diverso y recurre a disciplinas como la psicología cognitiva, la inteligencia artificial y las ciencias de la decisión. Según Bobrow y Dryzek (1987: 83), los analistas bajo este enfoque comparten un interés en cómo las personas y organizaciones procesan información para alcanzar juicios y resolver problemas.</p><p>Las raíces de esta perspectiva se encuentran en los trabajos fundamentales de Simon (1947, 1983), March y Simon (1958) y Cyert y March (1963). Estos autores exploran la noción de «mente organizacional», analizando cómo las estructuras institucionales moldean la percepción y el tratamiento de los datos. Dentro de esta corriente, Steinbruner (1974) aporta una contribución esencial al proponer una teoría cibernética de la decisión que desafía los modelos de racionalidad analítica. Asimismo, se incluyen estudios sobre el aprendizaje organizacional de Argyris y Schön (1978), el pensamiento de grupo o groupthink de Janis (1972)... En años más recientes, el análisis del procesamiento de la información ha integrado conceptos como los «mapas cognitivos» y los «sistemas de creencias»... citando los trabajos de Jervis (1976), Axelrod (1976), Larson (1985) y Khong (1992).</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.5",
+                sectionTitle: "Marcos y Aprendiz de Todo",
+                title: "La Psicología en las Políticas Públicas",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Aportación de la Psicología</h4>
+                            <p>Ofrece una visión del comportamiento humano mucho más depurada y empírica que el puro "interés personal" del economista.</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Las Etapas Psicológicas</h4>
+                            <p>Pre-decisión, decisión, post-decisión (Mann). El marco de Carroll y Johnson (Reconocimiento, opciones, acción).</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Psicología y la política de la prevención</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: El marco empírico de Carroll y Johnson</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "Psicología y análisis de las políticas públicas",
+                        content: `<p><strong>Psicología y análisis de las políticas públicas (pp. 70-1)</strong></p><p>Wayne Parsons sostiene que la psicología aporta elementos significativos a la ciencia de las políticas públicas, aunque la economía —y específicamente la teoría de la elección pública— ha ensombrecido esta contribución en gran medida. El autor destaca que la influencia de William James en el desarrollo del interaccionismo simbólico resultó fundamental para el estudio de los problemas sociales.</p><p>Harold Lasswell (1930’) sobresale como el primer autor que aplicó de manera sistemática la psicología y el psicoanálisis al estudio de la política. Defendía que el ideal de una «política de la prevención» consistía en evitar el conflicto mediante la reducción del nivel de tensión en la sociedad. Hacia la década de 1960, Herbert Simon realizó aportaciones clave mediante los enfoques cognitivos. Parsons también reconoce la deuda de la investigación de evaluación con pioneros como Campbell. Al integrar la contribución de la escuela de relaciones humanas de la teoría de gestión, la psicología ofrece una visión del comportamiento humano mucho más depurada y con mayor fundamento empírico que la noción de «interés personal» que proponen los economistas.</p><p>Durante la década de 1970, el entendimiento de la toma de decisiones colectivas avanzó gracias a los textos de Janis (1972/1982) y Janis y Mann (1977)... Mann (1969: 133-152), por ejemplo, distingue tres etapas fundamentales: pre-decisión, decisión y post-decisión.</p>`
+                    },
+                    {
+                        title: "El marco de Carroll y Johnson (1990)",
+                        content: `<p>Carroll y Johnson (1990: 16) a partir de investigaciones en psicología cognitiva (incluida la de Simon) contribuyeron al estudio empírico de las políticas con un el marco formado por:</p><ul><li><strong>Reconocimiento:</strong> Indaga quién nota el problema y qué eventos provocaron que se le etiquetara como una situación que requiere una decisión.</li><li><strong>Formulación:</strong> Examina quiénes participaron en la definición de los problemas, cómo se diferencian estos de otros problemas y qué metas surgieron.</li><li><strong>Generación de opciones:</strong> Cuestiona el origen de las alternativas y las razones por las cuales se detuvo la búsqueda de nuevas opciones.</li><li><strong>Búsqueda de información:</strong> Analiza la cantidad de información recopilada, los responsables de dicha tarea, el tipo de datos buscados...</li><li><strong>Evaluación/elección:</strong> Identifica los tipos de juicios aplicados, quiénes los emplearon y el tipo de conocimiento utilizado.</li><li><strong>Acción/reacción:</strong> Investiga los sucesos posteriores a la toma de la decisión y quién recibe la retroalimentación.</li></ul>`
+                    }
+                ]
+            },
+            {
+                section: "1.5",
+                sectionTitle: "Marcos y Aprendiz de Todo",
+                title: "Gerencialismo y Política Comparada",
+                visual: `
+                    <p class="slide-synthesis">
+                        A los marcos anteriores, Parsons suma el <span class="clickable-text" onclick="openModal(0)">Gerencialismo (NPM)</span>, 
+                        que desplaza la administración pública tradicional por una gestión de mercado (Drucker, Osborne y Gaebler). 
+                        Y finaliza con los marcos de análisis del <span class="clickable-text" onclick="openModal(1)">Contexto Político y la Política Comparada</span>, 
+                        esenciales para entender el poder y las tendencias globales.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Gestión Pública (NPM)</strong></div>
+                        <div class="diagram-arrow">+</div>
+                        <div class="diagram-node"><strong>Política Comparada</strong></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.5.5/ Las políticas públicas dentro de un marco gerencial",
+                        content: `<p><strong>1.5.5/ Las políticas públicas dentro de un marco gerencial (p. 71-3)</strong></p><p>Iniciado en la década de 1960 con McNamara, este enfoque se aceleró en los años 80 ante la presión sobre las finanzas públicas. Hacia la década de 1970, surge la noción de que la administración pública tradicional transitaba rápidamente hacia una forma de «gestión» pública. Este enfoque ganó terreno a partir de la década de 1980 bajo la etiqueta de la «Nueva Gestión Pública» (New Public Management o NPM)... El marco gerencial se consolidó así como una alternativa a la larga tradición de la administración pública (Rainey, 1990).</p><p>Peter Drucker y su "administración por objetivos" (APO) fueron influencias fundamentales. Obras como la de Peters y Waterman (1982) sobre empresas "excelentes"... y Osborne y Gaebler (1992) sobre la "reinvención del gobierno" marcaron esta era de gestión orientada al mercado desplazando críticamente a jerarquías administrativas weberianas.</p><p>Este marco desplaza el foco desde las reglas y los procedimientos hacia los resultados y el rendimiento... Parsons también recupera las voces críticas que desafían al gerencialismo, destacando los trabajos de Massey (1993) y Pollitt (1990).</p>`
+                    },
+                    {
+                        title: "1.5.6 y 1.5.7: El Proceso Político y la Política Comparada",
+                        content: `<p><strong>1.5.6/ La política en el proceso de las políticas publicas</strong></p><p>Parsons examina enfoques que buscan explicar el contexto político: Enfoques por etapas... pluralistas-elitistas (Dahl, Lindblom, Bachrach)... neomarxistas (Miliband, O’Connor, Offe)... subsistémicos (Heclo, Sabatier)... del discurso (Foucault, Habermas)... Institucionalismo (Skocpol, Hall).</p><p><strong>1.5.7 Políticas públicas comparadas</strong></p><p>Como señala Feldman (1978), este es un método para estudiar cómo y por qué diferentes gobiernos toman determinadas medidas. Heidenheimer et al. (1990) sostiene que este campo investiga... incluyendo la opción deliberada de no actuar. Vertientes de análisis: Socioeconómica (Wilensky), Partidista (Castles), Lucha de clases (Offe), Neocorporatista (Schmitter), Institucionalista (Hall). Métodos (Harrop, 1992): Estudios de caso, Análisis estadísticos, Comparación concreta. Finalmente, Parsons destaca que el análisis de políticas suele dividirse por etapas o por sectores (salud, educación, transporte, etc.).</p>`
+                    }
+                ]
+            },
+
+            // ================= SECCIÓN 1.6 =================
+            {
+                section: "1.6",
+                sectionTitle: "Marcos filosóficos",
+                title: "Los 7 Grupos Filosóficos Formativos",
+                visual: `
+                    <p class="slide-synthesis">
+                        La dimensión filosófica (ética, normativa y metodológica) aporta inmensamente al análisis. 
+                        Parsons identifica siete grupos de pensadores formativos. Empezaremos explorando a 
+                        <span class="clickable-text" onclick="openModal(0)">Maquiavelo (el poder y la astucia)</span> y a 
+                        <span class="clickable-text" onclick="openModal(1)">Francis Bacon (el positivismo y el equilibrio)</span>.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Maquiavelo</strong><br><small>Política para mantener el poder</small></div>
+                        <div class="diagram-arrow">VS</div>
+                        <div class="diagram-node"><strong>F. Bacon</strong><br><small>Política para mantener la autoridad/conocimiento</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.6/ Marcos filosóficos de análisis y Maquiavelo",
+                        content: `<p><strong>1.6/ Marcos filosóficos de análisis (Pág. 74)</strong></p><p>Parsons sostiene que la dimensión filosófica —ética, normativa y metodológica— realiza una aportación inmensa al análisis de las políticas públicas. Identifica siete grupos de pensadores formativos: Maquiavelo y Bacon; Bentham y Mill; James y Dewey; Rawls y Nozick; Karl Popper; Hayek; Etzioni; Habermas.</p><p><strong>1.6.1 Maquiavelo y Bacon (Pág. 75)</strong></p><p>El análisis se centra en Nicolás Maquiavelo (1469-1527), quien vinculó la teoría del gobierno con la experiencia política directa y el estudio de la historia. Parsons destaca que Maquiavelo consideraba esencial para los gobernantes comprender el funcionamiento del poder y contar con información de alta calidad e interpretación adecuada. Maquiavelo concebía el gobierno como un «arte» y su estudio como una «ciencia». Parsons recupera una analogía de The Economist (1991) para ilustrar que los actuales «intelectuales de las políticas públicas» desempeñan un papel similar al de Maquiavelo: buscan presentar conclusiones como consejos expertos mientras intentan influir en los políticos desde los think-tanks.</p><p>(Pág. 76) El autor subraya que Maquiavelo analizó la relación entre fines y medios dentro de procesos de cambio que superan el control racional, denominados «fortuna». Parsons concluye que el análisis de políticas del siglo XX heredó razones maquiavélicas: el deseo de entender qué sucede realmente en el gobierno y si el desempeño cumple sus promesas.</p>`
+                    },
+                    {
+                        title: "Francis Bacon y los The Machiavellians",
+                        content: `<p>Si Maquiavelo representó la política como astucia, Francis Bacon (1561-1626) analizó las políticas públicas en su acepción moderna: acciones racionales fundamentadas en el conocimiento. Bacon propuso que las buenas políticas deben buscar el «punto medio». Bacon acuñó la famosa máxima «el conocimiento es poder». En su obra New Atlantis (1627), Bacon describe un mundo donde los científicos detentan el poder real dentro de un nuevo orden social. Parsons identifica este pensamiento como la base del «positivismo». (Pág. 78) Bacon argumentaba que el progreso depende de la organización del conocimiento científico... Parsons afirma que Bacon representa la génesis de la idea moderna de las políticas públicas como un producto de la consideración racional y la ciencia (Bell, 1976).</p><p><strong>James Burnham, The Machiavellians: Defenders of Freedom, 1943 (p.77)</strong><br>James Burnham realiza una contribución fundamental... En The Machiavellians (1943), Burnham cuestiona el alcance de una posible gobernanza «científica». Burnham identifica un dilema central para la élite que intenta actuar bajo criterios lógicos: la cohesión social depende de la aceptación de mitos, pero la actitud científica impide creer en ellos. En consecuencia, el líder científico enfrenta la necesidad de mentir y fomentar activamente creencias que considera irreales para preservar el tejido social.</p><p><strong>Francis Bacon (complemento)</strong><br>En el Novum Organum (1620), Bacon sostiene que las políticas públicas deben basarse en la verdad, la razón y los hechos, superando lo que denomina los «ídolos de la mente»: Ídolos de la tribu, de la cueva, del mercado, del teatro.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.6",
+                sectionTitle: "Marcos filosóficos",
+                title: "Utilitarismo y Pragmatismo",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Utilitarismo (Bentham/Mill)</h4>
+                            <p>El principio de utilidad: la mayor felicidad para el mayor número. Base del análisis costo-beneficio.</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Pragmatismo (James/Dewey)</h4>
+                            <p>Experimentación social y la democracia como método de aprendizaje por ensayo y error.</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Bentham y Mill</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: James y Dewey</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.6.2 La aportación del utilitarismo: Bentham y Mill",
+                        content: `<p><strong>1.6.2 La aportación del utilitarismo: Bentham y Mill (Págs. 78-79)</strong></p><p>Jeremy Bentham (1748-1832) y James Mill (1773-1836), como principales exponentes del utilitarismo, propusieron que el «principio de utilidad» —definido como la mayor felicidad para el mayor número— debe regir tanto las acciones individuales como las políticas de gobierno. Bajo esta premisa, las decisiones correctas se juzgan por sus consecuencias positivas.</p><p>El utilitarismo impulsó la convicción de que es posible calcular placeres y pesares, comparando acciones a través de sus resultados. Este enfoque coadyuvó al desarrollo de teorías dedicadas a cuantificar y modelar el bienestar humano. Parsons indica que los argumentos en favor de reformas en las políticas públicas suelen adoptar este matiz utilitario para promover el bienestar social y la libertad individual.</p><p>Aunque la teoría recibe críticas por ignorar dimensiones morales, de equidad o de justicia, el autor aclara que el utilitarismo mantiene un papel central en el análisis de las políticas públicas. Si se entiende el análisis como las técnicas para evaluar y elegir opciones de políticas (Jenkins-Smith, 1990: 1), la aportación de Bentham y Mill define los elementos nodales del paradigma analítico: la idea de que calcular el bienestar humano es posible y deseable. Finalmente, esta premisa permitió que los economistas desarrollaran métodos para comparar costos contra beneficios y establecer niveles de eficacia.</p>`
+                    },
+                    {
+                        title: "1.6.3 El pragmatismo de James y Dewey",
+                        content: `<p><strong>1.6.3 El “pragmatismo" de James y Dewey y el desarrollo de la ciencia de las políticas públicas (p. 79)</strong></p><p>William James (1842-1910) y John Dewey consolidaron el pragmatismo moderno, filosofía iniciada por Charles S. Pierce. James propuso que la verdad no es estática, sino algo que «le ocurre» a las ideas a través de los eventos. Desde una perspectiva biológica, las ideas funcionan como actividades que permiten a los seres humanos modificar su entorno para sobrevivir. James distinguía entre filósofos «tenaces» (orientados al conocimiento empírico) y «suaves» (basados en el pensamiento abstracto). Su concepto de «empirismo radical» inspiró a reformadores y científicos sociales a buscar el progreso humano mediante la adaptación de las políticas públicas.</p><p>(pp. 80-1) John Dewey (1859-1952) definió el pragmatismo como un método de experimentación social basado en el aprendizaje por ensayo y error (Dewey, 1927, 1963). Para Dewey, la democracia constituye una actividad de investigación donde la sociedad intercambia ideas y resuelve problemas colectivamente. El autor defendió el desarrollo de «tecnologías políticas» para dotar a la democracia de métodos científicos de resolución de problemas.</p><p>Lasswell (1971: xiv), identifica a la ciencia de las políticas públicas como una adaptación contemporánea del enfoque pragmático de Dewey... El legado de James y Dewey radica en el llamado a las ciencias sociales para participar activamente en la creación de mejores gobiernos. Esta concentración en la resolución de problemas se convirtió en la convicción central del enfoque de políticas públicas de la posguerra a nivel global.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.6",
+                sectionTitle: "Marcos filosóficos",
+                title: "Teorías de la Justicia e Ingeniería Gradual",
+                visual: `
+                    <p class="slide-synthesis">
+                        El debate normativo se revitaliza en los 70s con <span class="clickable-text" onclick="openModal(0)">Rawls (Justicia como Imparcialidad) vs Nozick (Estado Mínimo)</span>. 
+                        Metodológicamente, se incorpora la filosofía de la ciencia de <span class="clickable-text" onclick="openModal(1)">Karl Popper y su "Ingeniería Social Gradual"</span>, 
+                        rechazando los utopismos totales a favor del ensayo y error falsable.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Rawls</strong><br><small>Imparcialidad</small></div>
+                        <div class="diagram-arrow">vs</div>
+                        <div class="diagram-node"><strong>Nozick</strong><br><small>Derechos individuales</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.6.4/ Rawls y Nozick: dos teorías de la justicia",
+                        content: `<p><strong>1.6.4/ Rawls y Nozick: dos teorías de la justicia (Págs. 80-81)</strong></p><p>Parsons destaca que, desde la década de 1970, John Rawls y Robert Nozick han revitalizado el debate filosófico aplicado a las políticas públicas, alcanzando una relevancia que no se veía desde el utilitarismo y la época de Dewey.</p><p>John Rawls, en su obra Teoría de la Justicia (1971), transforma el interés utilitarista por el bienestar en un modelo de justicia como imparcialidad. Rawls argumenta que las desigualdades sociales y económicas solo resultan aceptables si maximizan los beneficios de los miembros menos favorecidos de la sociedad. Su propuesta exige imparcialidad en los resultados y una igualdad de oportunidades real: individuos con habilidades similares deben contar con oportunidades similares en la vida. Sus defensores ven en este modelo los cimientos para mejores políticas públicas, mientras que sus críticos lo señalan como el ejemplo máximo de la intervención estatal excesiva.</p><p>Por su parte, Robert Nozick, en Anarquía, Estado y Utopía (1974), ofrece una crítica contundente a la formulación de políticas de corte rawlsiano, influyendo profundamente en la «nueva derecha». Nozick rechaza la justicia distributiva basada en la imparcialidad de los resultados y fundamenta su ataque en los derechos individuales y el concepto de «derecho a» (entitlement). Para este autor, la justicia consiste en lo que las personas tienen derecho a poseer, independientemente de si la distribución es imparcial. Nozick sostiene que los individuos y los mercados son los únicos medios que permiten organizar una sociedad con justicia en un mundo libre, tesis que impulsó las demandas de reducción de políticas públicas y mayor libertad de elección individual.</p>`
+                    },
+                    {
+                        title: "1.6.5 Karl Popper y el modelo de la ingeniería gradual",
+                        content: `<p><strong>1.6.5 Karl Popper y el modelo de la ingeniería gradual (Págs. 82-83)</strong></p><p>Karl Popper plantea implicaciones profundas para las ciencias sociales al sostener que las teorías científicas son aquellas capaces de ser «desaprobadas» (falsables). Bajo este criterio, critica al marxismo por proponer una teoría de la historia que impide establecer condiciones para probar su falsedad. Popper afirma que el conocimiento nunca es absoluto, sino tentativo y conjetural, evolucionando a través de un proceso cíclico: P1 -> TT -> EE -> P2 (donde P=problema, TT=teoría tentativa, EE=eliminación de errores).</p><p>Al aplicar este modelo a la sociedad, Popper argumenta que el progreso social no resulta de cambios totales o grandes esquemas utópicos —a los que asocia con la tragedia y la violencia—, sino de un ciclo de experimentación de ensayo y error. A este método, retomado de Roscoe Pound, lo denomina «ingeniería social gradual» (Popper, 1969). Según esta visión, la política debe reconocer las limitaciones del conocimiento y de las instituciones humanas.</p><p>En consecuencia, la formulación de políticas funciona como una resolución científica de problemas que exige un espíritu crítico, abierto y experimental. Donald Campbell y Alice Rivlin son los principales representantes de este enfoque en el análisis de políticas públicas. El método de aprendizaje paso a paso se vincula con las teorías de decisión de Collingridge (1992), las cuales enfatizan la naturaleza iterativa del «ensayo y error».</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.6",
+                sectionTitle: "Marcos filosóficos",
+                title: "Mercados y Comunitarismo",
+                visual: `
+                    <div class="concept-grid">
+                        <div class="concept-card">
+                            <h4>Hayek (Mercados Libres)</h4>
+                            <p>El orden espontáneo frente a la arrogancia de la planificación "científica".</p>
+                        </div>
+                        <div class="concept-card">
+                            <h4>Etzioni (Comunitarismo)</h4>
+                            <p>El tejido social intermedio y el equilibrio de la <i>subsidiaridad</i> frente a la alienación individualista.</p>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button class="btn-profundidad" onclick="openModal(0)">Leer: Hayek y el Orden Espontáneo</button>
+                        <button class="btn-profundidad" onclick="openModal(1)">Leer: Etzioni y la Solidaridad</button>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.6.6/ El argumento de Hayek",
+                        content: `<p><strong>1.6.6/ El argumento de Hayek en favor de los mercados y la elección individual (pp. 83-85)</strong></p><p>Friedrich Hayek ejerció una influencia considerable en las políticas públicas, aunque su obra permaneció al margen durante la «era keynesiana». Fue hacia finales de la década de 1970... cuando textos como The Road to Serfdom (1944) y The Constitution of Liberty (1960) se integraron en la agenda dominante. Hayek se convirtió, junto a Nozick, en la fuente principal de ideas para la «nueva derecha».</p><p>El marco de análisis de Hayek rechaza el positivismo lógico y la planificación «científica» de la sociedad. El autor argumenta que el conocimiento humano es limitado y fragmentado, por lo que es imposible y peligroso que el Estado o la burocracia pretendan coordinar la infinita información necesaria para intervenir en el mercado. Para Hayek, la sociedad no es un diseño humano, sino un orden espontáneo. Intentar mejorar este orden mediante políticas gubernamentales constituye un error epistemológico y moral.</p><p>Hayek sostiene que la creencia en la capacidad del gobierno para dirigir la economía se manifestó en los horrores del fascismo y el comunismo. Advierte que las democracias liberales también corren el riesgo de inestabilidad si operan bajo la ilusión de que las instituciones públicas pueden resolver problemas mejor que los individuos y los mercados. La implicación fundamental de este enfoque es que los diseñadores de políticas no pueden «resolver» problemas ni mejorar los resultados de la interacción libre. Por ello, la función de las políticas públicas es limitada: deben asegurar que el orden espontáneo funcione sin interferencias... Permitiendo que el mercado asigne recursos con efectividad, rechazando la redistribución.</p>`
+                    },
+                    {
+                        title: "1.6.7 Etzioni y el comunitarismo",
+                        content: `<p><strong>1.6.7 Etzioni y el comunitarismo (pp. 86-88)</strong></p><p>Parsons describe la evolución de los marcos de análisis situando al «comunitarismo» como la filosofía protagonista de la década de 1990... Los principales exponentes de esta corriente son Walzer (1983), Sandel (1984) y Taylor (1985), cuyos argumentos a favor de renovar la idea de comunidad ofrecieron una alternativa al individualismo atomizado de la época anterior.</p><p>Conforme a Seumas Milne (1994), el comunitarismo descansa en dos ideas esenciales. Primero, sostiene que las sociedades modernas han perdido el sentido de solidaridad social, provocando que el tejido social intermedio —formado por asociaciones, escuelas, familias, iglesias y sindicatos— se marchite ante el impacto del mercado. En segundo lugar, los comunitaristas critican al liberalismo por otorgar un peso excesivo a los derechos individuales en detrimento de las obligaciones, generando alienación social.</p><p>Amitai Etzioni (1968, 1993a, 1993b, 1994) se sitúa a la vanguardia del comunitarismo aplicándolo directamente a las políticas públicas. Su propuesta busca un punto medio entre el control estatal y la dependencia del mercado. Etzioni defiende un Estado de bienestar fuerte pero no dominante, donde ciertas tareas se trasladen de nuevo a los individuos y sus comunidades. El sustento de este cambio es el principio de subsidiaridad: Individuo -> Familia -> Comunidad -> Estado. El Estado solo debe intervenir en última instancia.</p>`
+                    }
+                ]
+            },
+            {
+                section: "1.6",
+                sectionTitle: "Marcos filosóficos",
+                title: "Habermas y la Racionalidad Comunicativa",
+                visual: `
+                    <p class="slide-synthesis">
+                        Finalmente, el análisis de políticas encuentra en 
+                        <span class="clickable-text" onclick="openModal(0)">Jürgen Habermas (1.6.8)</span> una dura crítica al instrumentalismo. 
+                        Se propone sustituir la razón calculadora por una <span class="clickable-text" onclick="openModal(1)">racionalidad construida intersubjetivamente</span> 
+                        (entendimiento mutuo), lo que revoluciona el foco hacia el lenguaje, el discurso y la participación ciudadana profunda.
+                    </p>
+                    <div class="diagram-flow">
+                        <div class="diagram-node"><strong>Instrumental (Cálculo)</strong><br><small>Técnicas de control sujeto-objeto</small></div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-node"><strong>Comunicativa (Entendimiento)</strong><br><small>Situación del Discurso Ideal</small></div>
+                    </div>
+                `,
+                popups: [
+                    {
+                        title: "1.6.8/ Habermas y la crítica a la razón instrumental",
+                        content: `<p><strong>1.6.8/ Habermas y la racionalidad comunicativa (Págs. 87-88)</strong></p><p>Wayne Parsons observa que el análisis de las políticas públicas ha mantenido, hasta tiempos recientes, una visión rígida sobre la razón humana, predominando la creencia en la racionalidad para la «resolución» de problemas. Esta postura se manifiesta en técnicas utilitarias como el análisis de costo-beneficio, la investigación operacional y el análisis sistémico (sección 3.8).</p><p>Frente a este enfoque, los teóricos críticos alemanes como Habermas y los franceses como Foucault cuestionan el uso de la racionalidad como herramienta de control y opresión. Estas ideas han cobrado relevancia como fuentes de enfoques críticos en la disciplina (de Haven-Smith, 1988; Hawkesworth, 1988).</p>`
+                    },
+                    {
+                        title: "La Racionalidad Comunicativa y el Discurso Ideal",
+                        content: `<p>Habermas propone sustituir la «racionalidad instrumental» —encapsulada en las técnicas analíticas tradicionales— por un modelo de racionalidad comunicativa. Patsy Healey (1993: 238-240) explica que este modelo ofrece un camino para las sociedades contemporáneas al desplazar la razón desde una perspectiva individualizada (sujeto-objeto) hacia un razonamiento construido mediante la comunicación intersubjetiva. Este enfoque busca el entendimiento mutuo como el centro de la actividad del razonamiento, reemplazando la «filosofía de la conciencia» centrada en el sujeto que ha dominado Occidente desde la Ilustración.</p><p>Para Habermas, la razón no constituye un proceso lógico de prueba objetiva o refutación, sino el acto de «alcanzar el entendimiento dentro de un contexto social» (de Haven-Smith, 1988: 85). Parsons identifica dos niveles de implicaciones para las políticas públicas:</p><ul><li><strong>Nivel teórico:</strong> Sugiere otorgar mayor atención al lenguaje, al discurso y al argumento.</li><li><strong>Nivel práctico:</strong> Teorías como la «situación del discurso ideal» impulsan la búsqueda de nuevos métodos de análisis y procesos institucionales que promuevan un enfoque intercomunicativo en la formulación y ejecución de políticas (Fischer y Forester, 1993; Dryzek, 1987, 1990, 1993).</li></ul><p>El autor también vincula el impacto de Habermas con la teoría organizacional y la administración pública... Finalmente, Parsons sostiene que el interés por Habermas debería reavivar el estudio de la obra de Harold Lasswell, cuyas ideas sobre la función de la ciencia de las políticas comparten elementos fundamentales con las teorías habermasianas.</p><p><em>FIN DEL DOCUMENTO</em></p>`
+                    }
+                ]
+            }
+        ];
+
+        // ESTADO DE LA APLICACIÓN
+        let currentIndex = 0;
+        const totalSlides = slidesData.length;
+
+        // ELEMENTOS DEL DOM
+        const container = document.getElementById('slide-container');
+        const progressFill = document.getElementById('progress-fill');
+        const slideCounter = document.getElementById('slide-counter');
+        const btnNext = document.getElementById('btn-next');
+        const btnPrev = document.getElementById('btn-prev');
+        const navMenu = document.getElementById('nav-menu');
+        
+        // Modal
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const btnCloseModal = document.getElementById('btn-close-modal');
+
+        /**
+         * Inicializa la aplicación
+         */
+        function init() {
+            renderSidebar();
+            updateView();
+            setupEventListeners();
+        }
+
+        /**
+         * Renderiza el menú lateral agrupado por secciones
+         */
+        function renderSidebar() {
+            let currentSection = "";
+            let html = "";
+            
+            slidesData.forEach((slide, index) => {
+                if(slide.section !== currentSection) {
+                    currentSection = slide.section;
+                    let sectionLabel = slide.section === 'Portada' ? 'Inicio' : `Sec. ${slide.section}`;
+                    
+                    html += `
+                        <div class="nav-item ${index === 0 ? 'active' : ''}" 
+                             data-index="${index}" 
+                             id="nav-item-${index}">
+                            <strong>${sectionLabel}</strong>: ${slide.sectionTitle}
+                        </div>
+                    `;
+                }
+            });
+            navMenu.innerHTML = html;
+        }
+
+        /**
+         * Actualiza el contenido de la diapositiva y los controles
+         */
+        function updateView() {
+            const slide = slidesData[currentIndex];
+            
+            // Efecto de transición
+            container.classList.remove('visible');
+            
+            setTimeout(() => {
+                let badgeHtml = slide.section === 'Portada' ? '' : `<span class="section-badge">Sección ${slide.section}</span>`;
+                let titleHtml = slide.title ? `<h2 class="slide-title">${slide.title}</h2>` : '';
+
+                container.innerHTML = `
+                    ${badgeHtml}
+                    ${titleHtml}
+                    ${slide.visual}
+                `;
+                container.classList.add('visible');
+            }, 300);
+
+            // Actualizar Controles
+            btnPrev.disabled = currentIndex === 0;
+            btnNext.disabled = currentIndex === totalSlides - 1;
+            
+            // Actualizar Progreso
+            slideCounter.textContent = `${currentIndex + 1} / ${totalSlides}`;
+            progressFill.style.width = `${((currentIndex + 1) / totalSlides) * 100}%`;
+
+            // Actualizar Menú Lateral
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // Encontrar el nav-item correspondiente a la sección actual
+            let targetNavIndex = currentIndex;
+            while(targetNavIndex >= 0 && !document.getElementById(`nav-item-${targetNavIndex}`)) {
+                targetNavIndex--;
+            }
+            if(document.getElementById(`nav-item-${targetNavIndex}`)) {
+                document.getElementById(`nav-item-${targetNavIndex}`).classList.add('active');
+            }
+            
+            // Hacer scroll hasta arriba al cambiar de slide
+            container.scrollTop = 0;
+        }
+
+        /**
+         * Eventos (Teclado, Swipe, Botones)
+         */
+        function setupEventListeners() {
+            // Controles de botones
+            btnNext.addEventListener('click', () => { if(currentIndex < totalSlides - 1) { currentIndex++; updateView(); } });
+            btnPrev.addEventListener('click', () => { if(currentIndex > 0) { currentIndex--; updateView(); } });
+
+            // Navegación en el Menú Lateral
+            navMenu.addEventListener('click', (e) => {
+                const item = e.target.closest('.nav-item');
+                if(item) {
+                    currentIndex = parseInt(item.getAttribute('data-index'));
+                    updateView();
+                }
+            });
+
+            // Teclado
+            document.addEventListener('keydown', (e) => {
+                if (modalOverlay.classList.contains('active')) {
+                    if (e.key === 'Escape') closeModal();
+                    return;
+                }
+                if (e.key === 'ArrowRight' && currentIndex < totalSlides - 1) {
+                    currentIndex++; updateView();
+                }
+                if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                    currentIndex--; updateView();
+                }
+            });
+
+            // Swipe táctil
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.getElementById('main-content').addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+            
+            document.getElementById('main-content').addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+
+            function handleSwipe() {
+                const minSwipeDistance = 50;
+                // Prevenir swipe accidental si el usuario está haciendo scroll dentro del contenido (opcional)
+                if (touchEndX < touchStartX - minSwipeDistance && currentIndex < totalSlides - 1) {
+                    currentIndex++; updateView(); // Izquierda -> Siguiente
+                }
+                if (touchEndX > touchStartX + minSwipeDistance && currentIndex > 0) {
+                    currentIndex--; updateView(); // Derecha -> Anterior
+                }
+            }
+
+            // Cerrar modal
+            btnCloseModal.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+        }
+
+        /**
+         * Control del Modal (Textos Profundos distribuidos en arrays)
+         * @param {number} popupIndex - Índice del popup dentro de la diapositiva actual.
+         */
+        window.openModal = function(popupIndex) {
+            const slide = slidesData[currentIndex];
+            if(!slide || !slide.popups || !slide.popups[popupIndex]) return;
+            
+            const popupData = slide.popups[popupIndex];
+            
+            modalTitle.textContent = popupData.title;
+            modalText.innerHTML = popupData.content;
+            
+            // Forzar scroll al inicio del modal text
+            modalText.scrollTop = 0;
+            
+            modalOverlay.classList.add('active');
+        };
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        // Ejecutar aplicación
+        init();
+
+    </script>
+</body>
+</html>
